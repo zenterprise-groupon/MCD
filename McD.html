@@ -1,0 +1,2247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groupon x McDonald's Rewards | Campaign Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.prod.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #DA291C 0%, #BC1D1A 100%);
+            color: white;
+            padding: 24px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo-mcd {
+            font-weight: 700;
+            font-size: 24px;
+            color: #FFBC0D;
+        }
+        
+        .logo-groupon {
+            font-weight: 700;
+            font-size: 24px;
+            color: white;
+        }
+        
+        .logo-divider {
+            font-size: 20px;
+            opacity: 0.7;
+        }
+        
+        .tagline {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+        
+        /* Navigation Tabs */
+        .nav-tabs {
+            background-color: white;
+            border-bottom: 1px solid #e5e5e7;
+            padding: 0 20px;
+        }
+        
+        .tabs-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+        }
+        
+        .tab {
+            padding: 16px 24px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            color: #515154;
+        }
+        
+        .tab:hover {
+            color: #DA291C;
+            background-color: #f9f9f9;
+        }
+        
+        .tab.active {
+            color: #DA291C;
+            border-bottom-color: #DA291C;
+            font-weight: 600;
+        }
+        
+        /* Main Dashboard */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 24px;
+            padding: 30px 0;
+        }
+        
+        /* Cards */
+        .card {
+            background-color: white;
+            border-radius: 18px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 24px;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .card-subtitle {
+            font-size: 14px;
+            color: #86868b;
+            margin-top: 4px;
+        }
+        
+        .card-content {
+            padding: 24px;
+        }
+        
+        /* Country Cards */
+        .countries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .country-card {
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .country-card.active {
+            border-color: #DA291C;
+        }
+        
+        .country-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #DA291C;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #86868b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Cities List */
+        .cities-list {
+            list-style: none;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+        
+        .city-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .city-name {
+            font-weight: 500;
+        }
+        
+        .city-value {
+            font-weight: 600;
+            color: #1d1d1f;
+        }
+        
+        /* Profile Stats */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .profile-item {
+            padding: 16px;
+            background: #f8f8fa;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .profile-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #DA291C;
+            margin-bottom: 4px;
+        }
+        
+        .profile-label {
+            font-size: 14px;
+            color: #86868b;
+        }
+        
+        /* Progress Bars */
+        .progress-container {
+            margin-bottom: 20px;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #DA291C, #FFBC0D);
+            border-radius: 4px;
+        }
+        
+        /* Sidebar - Rewards Section */
+        .rewards-section {
+            background: linear-gradient(180deg, #1d1d1f 0%, #2c2c2e 100%);
+            color: white;
+            border-radius: 18px;
+            padding: 0;
+            position: sticky;
+            top: 160px;
+        }
+        
+        .rewards-header {
+            padding: 24px;
+            border-bottom: 1px solid #3a3a3c;
+        }
+        
+        .rewards-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #FFBC0D;
+        }
+        
+        .rewards-subtitle {
+            font-size: 14px;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+        
+        .rewards-content {
+            padding: 24px;
+        }
+        
+        .step {
+            display: flex;
+            margin-bottom: 24px;
+            align-items: flex-start;
+        }
+        
+        .step-number {
+            background: #DA291C;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 16px;
+        }
+        
+        .step-description {
+            font-size: 14px;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+        
+        .eligibility-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+        
+        .eligibility-list li {
+            padding: 8px 0;
+            font-size: 14px;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .eligibility-list li:before {
+            content: "✓";
+            color: #30D158;
+            font-weight: bold;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        
+        .btn-redeem {
+            background: linear-gradient(135deg, #FFBC0D 0%, #FF9900 100%);
+            color: #1d1d1f;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .btn-redeem:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 188, 13, 0.3);
+        }
+        
+        .btn-redeem:active {
+            transform: translateY(0);
+        }
+        
+        /* Opt-In Form */
+        .optin-form {
+            margin-top: 24px;
+            border-top: 1px solid #e5e5e7;
+            padding-top: 24px;
+        }
+        
+        /* Stakeholders Section */
+        .stakeholders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 24px;
+        }
+        
+        .stakeholder-card {
+            padding: 20px;
+            background: #f8f8fa;
+            border-radius: 12px;
+            border-left: 4px solid #DA291C;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .stakeholder-card:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        }
+        
+        .stakeholder-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-bottom: 16px;
+            border: 3px solid white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #e5e5e7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #86868b;
+        }
+        
+        .stakeholder-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .stakeholder-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 4px;
+        }
+        
+        .stakeholder-role {
+            font-size: 14px;
+            color: #DA291C;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        .stakeholder-responsibility {
+            font-size: 14px;
+            color: #515154;
+            line-height: 1.4;
+        }
+        
+        .stakeholder-actions {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .stakeholder-card:hover .stakeholder-actions {
+            opacity: 1;
+        }
+        
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .action-btn.edit {
+            background-color: #007AFF;
+            color: white;
+        }
+        
+        .action-btn.delete {
+            background-color: #FF3B30;
+            color: white;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Add Stakeholder Button */
+        .add-stakeholder-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            background: #f8f8fa;
+            border: 2px dashed #d2d2d7;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #86868b;
+        }
+        
+        .add-stakeholder-btn:hover {
+            background: #f0f0f5;
+            border-color: #DA291C;
+            color: #DA291C;
+        }
+        
+        .add-stakeholder-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+        
+        /* Discussion Points */
+        .discussion-points-section {
+            margin-top: 40px;
+        }
+        
+        .discussion-point-card {
+            background: #f8f8fa;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .discussion-point-card:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        }
+        
+        .discussion-point-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        
+        .discussion-point-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #DA291C;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+        
+        .discussion-point-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .discussion-point-card:hover .discussion-point-actions {
+            opacity: 1;
+        }
+        
+        .discussion-point-details {
+            color: #515154;
+            line-height: 1.5;
+        }
+        
+        .discussion-point-details p {
+            margin-bottom: 8px;
+        }
+        
+        .add-discussion-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: #f8f8fa;
+            border: 2px dashed #d2d2d7;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #86868b;
+            font-weight: 500;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .add-discussion-btn:hover {
+            background: #f0f0f5;
+            border-color: #DA291C;
+            color: #DA291C;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal {
+            background-color: white;
+            border-radius: 18px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #86868b;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-close:hover {
+            background-color: #f5f5f7;
+        }
+        
+        .modal-content {
+            padding: 24px;
+        }
+        
+        /* Form Elements */
+        .form-row {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #1d1d1f;
+        }
+        
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d2d2d7;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: white;
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #DA291C;
+            box-shadow: 0 0 0 3px rgba(218, 41, 28, 0.1);
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        .avatar-upload {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .avatar-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            background-color: #f5f5f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #e5e5e7;
+        }
+        
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .avatar-upload-btn {
+            background-color: #f8f8fa;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .avatar-upload-btn:hover {
+            background-color: #f0f0f5;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #DA291C 0%, #BC1D1A 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(218, 41, 28, 0.2);
+        }
+        
+        .btn-secondary {
+            background: #f8f8fa;
+            color: #1d1d1f;
+            border: 1px solid #d2d2d7;
+            border-radius: 10px;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #f0f0f5;
+        }
+        
+        /* Checklist */
+        .checklist {
+            margin-top: 30px;
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            padding: 16px;
+            background: #f8f8fa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .checklist-item:hover {
+            background: #f0f0f5;
+        }
+        
+        .checklist-checkbox {
+            margin-right: 12px;
+            margin-top: 4px;
+        }
+        
+        .checklist-content {
+            flex: 1;
+        }
+        
+        .checklist-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .checklist-description {
+            font-size: 14px;
+            color: #515154;
+        }
+        
+        .checklist-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .checklist-item:hover .checklist-actions {
+            opacity: 1;
+        }
+        
+        /* Footer */
+        .footer {
+            padding: 30px 0;
+            border-top: 1px solid #e5e5e7;
+            font-size: 12px;
+            color: #86868b;
+            text-align: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .footer-links a {
+            color: #515154;
+            text-decoration: none;
+        }
+        
+        .footer-links a:hover {
+            color: #DA291C;
+            text-decoration: underline;
+        }
+        
+        .confidential {
+            background: #DA291C;
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .rewards-section {
+                position: static;
+                margin-top: 30px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .countries-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            
+            .stakeholders-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Confidential Banner -->
+        <div class="confidential">
+            <i class="fas fa-lock"></i> GROUPON Confidential and Proprietary 2023 | Prepared for: Eloise Monnin, Tech & Marketing Kickoff / Manager Engagement / Operations &lt;eloise.monnin@us.mcd.com&gt;
+        </div>
+        
+        <!-- Header -->
+        <header class="header">
+            <div class="container header-content">
+                <div class="logo-section">
+                    <div class="logo">
+                        <span class="logo-mcd">McDonald's</span>
+                        <span class="logo-divider">×</span>
+                        <span class="logo-groupon">Groupon</span>
+                    </div>
+                    <div class="tagline">Global Campaign Management & Market Opt-In Portal</div>
+                </div>
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Eloise Monnin | Tech & Marketing Kickoff Manager</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <div class="tabs-container">
+                <div class="tab" :class="{active: activeTab === 'dashboard'}" @click="activeTab = 'dashboard'">
+                    <i class="fas fa-chart-bar"></i> Data Dashboard
+                </div>
+                <div class="tab" :class="{active: activeTab === 'project'}" @click="activeTab = 'project'">
+                    <i class="fas fa-project-diagram"></i> Project Details
+                </div>
+                <div class="tab" :class="{active: activeTab === 'optin'}" @click="activeTab = 'optin'">
+                    <i class="fas fa-check-circle"></i> Market Opt-Ins ({{ marketSubmissions.length }})
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Dashboard Tab -->
+        <main v-if="activeTab === 'dashboard'" class="container dashboard">
+            <!-- Left Column: Data Dashboard -->
+            <div class="dashboard-left">
+                <!-- UK Customer Profile -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">UK Active Groupon Customer Profile</div>
+                            <div class="card-subtitle">Groupon Internal Data | Q2 2022 - Q1 2023</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div class="profile-grid">
+                            <div class="profile-item">
+                                <div class="profile-value">52.42%</div>
+                                <div class="profile-label">Female</div>
+                            </div>
+                            <div class="profile-item">
+                                <div class="profile-value">47.58%</div>
+                                <div class="profile-label">Male</div>
+                            </div>
+                            <div class="profile-item">
+                                <div class="profile-value">56%</div>
+                                <div class="profile-label">Over $30k Income</div>
+                            </div>
+                            <div class="profile-item">
+                                <div class="profile-value">44%</div>
+                                <div class="profile-label">Under $30k Income</div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container" style="margin-top: 24px;">
+                            <div class="progress-label">
+                                <span>Suburban</span>
+                                <span>44%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" :style="{width: '44%'}"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Urban</span>
+                                <span>31%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" :style="{width: '31%'}"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Rural</span>
+                                <span>25%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" :style="{width: '25%'}"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container" style="margin-top: 24px;">
+                            <div class="progress-label">
+                                <span>Family Households</span>
+                                <span>64%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" :style="{width: '64%'}"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Single Households</span>
+                                <span>36%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" :style="{width: '36%'}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Global Data -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Groupon Global Customer Data</div>
+                        <div class="card-subtitle">Select a country to view detailed metrics</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="countries-grid">
+                            <div 
+                                v-for="country in countries" 
+                                :key="country.id"
+                                class="card country-card" 
+                                :class="{active: selectedCountry.id === country.id}"
+                                @click="selectCountry(country)"
+                            >
+                                <div class="card-content">
+                                    <h3 style="margin-bottom: 16px; font-size: 18px;">{{ country.name }}</h3>
+                                    <div class="country-stats">
+                                        <div class="stat">
+                                            <div class="stat-value">{{ formatNumber(country.visits) }}</div>
+                                            <div class="stat-label">Visits</div>
+                                        </div>
+                                        <div class="stat">
+                                            <div class="stat-value">{{ formatNumber(country.purchases) }}</div>
+                                            <div class="stat-label">Purchases</div>
+                                        </div>
+                                        <div class="stat">
+                                            <div class="stat-value">{{ country.revenue }}</div>
+                                            <div class="stat-label">Revenue</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Selected Country Details -->
+                <div class="card" v-if="selectedCountry">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Groupon {{ selectedCountry.name }} Customer Data</div>
+                            <div class="card-subtitle">Top cities by subscriber count</div>
+                        </div>
+                        <div style="display: flex; gap: 16px;">
+                            <div style="text-align: right;">
+                                <div style="font-size: 12px; color: #86868b;">Monthly Visitors</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #DA291C;">{{ formatNumber(selectedCountry.visits) }}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 12px; color: #86868b;">Total Subscribers</div>
+                                <div style="font-size: 24px; font-weight: 700; color: #DA291C;">{{ formatNumber(selectedCountry.subscribers) }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <ul class="cities-list">
+                            <li class="city-item" v-for="city in selectedCountry.cities" :key="city.name">
+                                <span class="city-name">{{ city.name }}</span>
+                                <span class="city-value">{{ formatNumber(city.value) }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Market Opt-In Form -->
+                <div class="card optin-form" v-if="showOptInForm">
+                    <div class="card-header">
+                        <div class="card-title">Market Opt-In Form</div>
+                        <div class="card-subtitle">Opportunity: 30% off your purchase with Groupon</div>
+                    </div>
+                    <div class="card-content">
+                        <div style="background: #f8f8fa; padding: 16px; border-radius: 10px; margin-bottom: 24px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <span><strong>Launch Timing:</strong> March 1, 2026 - May 31, 2026</span>
+                                <span><strong>Retail Value:</strong> up to $50 in savings</span>
+                            </div>
+                            <div>
+                                <strong>Value Exchange:</strong> Marketing Tile, Hero Reward Icon, and 3x Push Notifications
+                            </div>
+                        </div>
+                        
+                        <form @submit.prevent="submitMarketOptIn">
+                            <div class="form-row">
+                                <label class="form-label">Country / Market *</label>
+                                <select class="form-select" v-model="marketOptIn.country" required>
+                                    <option value="">Please Select</option>
+                                    <option v-for="country in countries" :value="country.name">{{ country.name }}</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-row">
+                                <label class="form-label">Market Contact *</label>
+                                <div class="form-grid">
+                                    <div>
+                                        <input type="text" class="form-input" placeholder="First Name" v-model="marketOptIn.firstName" required>
+                                    </div>
+                                    <div>
+                                        <input type="text" class="form-input" placeholder="Last Name" v-model="marketOptIn.lastName" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <label class="form-label">Market Contact Email *</label>
+                                <input type="email" class="form-input" placeholder="example@example.com" v-model="marketOptIn.email" required>
+                            </div>
+                            
+                            <div class="form-row">
+                                <label class="form-label">Activation Start Date *</label>
+                                <div class="form-grid">
+                                    <div>
+                                        <input type="date" class="form-input" v-model="marketOptIn.startDate" required>
+                                    </div>
+                                    <div>
+                                        <input type="date" class="form-input" v-model="marketOptIn.endDate" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <label class="form-label">Are you planning to activate this partner as part of a broader campaign (e.g. Monopoly)? If so, what campaign?</label>
+                                <textarea class="form-textarea" rows="3" v-model="marketOptIn.campaignDetails"></textarea>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="btn-primary">
+                                    <i class="fas fa-paper-plane"></i> Submit Market Opt-In
+                                </button>
+                                <button type="button" class="btn-secondary" @click="exportMarketData">
+                                    <i class="fas fa-file-excel"></i> Export to Excel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column: Rewards Section -->
+            <div class="rewards-section card">
+                <div class="rewards-header">
+                    <div class="rewards-title">MyMcDonald's Rewards</div>
+                    <div class="rewards-subtitle">Redeem your points for exclusive Groupon deals. Get at least 30% off on qualifying offers.</div>
+                </div>
+                
+                <div class="rewards-content">
+                    <!-- Eligibility Requirements -->
+                    <h3 style="margin-bottom: 16px; font-size: 18px; color: #FFBC0D;">✅ Eligibility</h3>
+                    <ul class="eligibility-list">
+                        <li>Be an active MyMcDonald's Rewards member</li>
+                        <li>Successfully redeem the required number of points to receive the reward</li>
+                        <li>Be located in a participating territory where the promotion is active</li>
+                        <li>Have or create a Groupon account and agree to Groupon's Terms of Use</li>
+                        <li>Meet any additional eligibility requirements outlined in the applicable Program Terms</li>
+                    </ul>
+                    
+                    <!-- How to Redeem -->
+                    <h3 style="margin-bottom: 20px; font-size: 18px; color: #FFBC0D; margin-top: 30px;">🔄 How to Redeem</h3>
+                    
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Redeem Your Reward</div>
+                            <div class="step-description">Use your MyMcDonald's Rewards points to unlock the Groupon promo code.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Receive Your Code</div>
+                            <div class="step-description">McDonald's will distribute your unique digital promo code to you through the Rewards experience.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Visit Groupon</div>
+                            <div class="step-description">Go to the Groupon website or open the Groupon mobile app.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Choose an Eligible Deal</div>
+                            <div class="step-description">Browse and select a qualifying Groupon deal (excluding McDonald's competitors).</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <div class="step-title">Apply at Checkout</div>
+                            <div class="step-description">Enter your promo code at checkout to receive at least 30% off instantly.</div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-redeem" @click="toggleOptInForm">
+                        <i class="fas fa-gift"></i> {{ showOptInForm ? 'Hide Market Opt-In Form' : 'Show Market Opt-In Form' }}
+                    </button>
+                    
+                    <div style="margin-top: 24px; font-size: 12px; opacity: 0.7; text-align: center;">
+                        This promotion is exclusively for McDonald's Rewards members. Valid only in participating territories.
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Project Details Tab -->
+        <main v-if="activeTab === 'project'" class="container" style="padding: 30px 0;">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Groupon x McDonald's Campaign Details</div>
+                    <div class="card-subtitle">Stakeholders, Key Discussion Points, and Action Items</div>
+                </div>
+                <div class="card-content">
+                    <!-- Stakeholders -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3 style="font-size: 22px; color: #DA291C;">Stakeholders & Roles</h3>
+                        <button class="btn-primary" @click="openStakeholderModal(null)" style="padding: 10px 20px; font-size: 14px;">
+                            <i class="fas fa-plus"></i> Add Stakeholder
+                        </button>
+                    </div>
+                    
+                    <div class="stakeholders-grid">
+                        <div 
+                            v-for="stakeholder in stakeholders" 
+                            :key="stakeholder.id"
+                            class="stakeholder-card"
+                        >
+                            <div class="stakeholder-avatar">
+                                <img v-if="stakeholder.avatar" :src="stakeholder.avatar" :alt="stakeholder.name">
+                                <div v-else>
+                                    {{ stakeholder.name.charAt(0).toUpperCase() }}
+                                </div>
+                            </div>
+                            
+                            <div class="stakeholder-name">{{ stakeholder.name }}</div>
+                            <div class="stakeholder-role">{{ stakeholder.role }}</div>
+                            <div class="stakeholder-responsibility">{{ stakeholder.responsibility }}</div>
+                            
+                            <div class="stakeholder-actions">
+                                <button class="action-btn edit" @click="openStakeholderModal(stakeholder)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete" @click="confirmDeleteStakeholder(stakeholder)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="add-stakeholder-btn" @click="openStakeholderModal(null)">
+                            <div class="add-stakeholder-icon">
+                                <i class="fas fa-plus-circle"></i>
+                            </div>
+                            <div>Add New Stakeholder</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Key Discussion Points (Now Editable) -->
+                    <div class="discussion-points-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                            <h3 style="font-size: 22px; color: #DA291C;">Key Discussion Points</h3>
+                            <button class="btn-primary" @click="openDiscussionModal(null)" style="padding: 10px 20px; font-size: 14px;">
+                                <i class="fas fa-plus"></i> Add Discussion Point
+                            </button>
+                        </div>
+                        
+                        <div 
+                            v-for="discussion in discussionPoints" 
+                            :key="discussion.id"
+                            class="discussion-point-card"
+                        >
+                            <div class="discussion-point-header">
+                                <div class="discussion-point-title">
+                                    <i :class="discussion.icon"></i> {{ discussion.title }}
+                                </div>
+                                <div class="discussion-point-actions">
+                                    <button class="action-btn edit" @click="openDiscussionModal(discussion)">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="action-btn delete" @click="confirmDeleteDiscussion(discussion)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="discussion-point-details" v-html="discussion.details"></div>
+                        </div>
+                        
+                        <div class="add-discussion-btn" @click="openDiscussionModal(null)">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Add New Discussion Point</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Checklist (Action Items) -->
+                    <div class="checklist">
+                        <h3 style="margin-bottom: 16px; font-size: 22px; color: #DA291C;">Immediate Action Items</h3>
+                        
+                        <div 
+                            v-for="item in checklistItems" 
+                            :key="item.id"
+                            class="checklist-item"
+                        >
+                            <div class="checklist-checkbox">
+                                <input type="checkbox" v-model="item.completed" @change="saveChecklist">
+                            </div>
+                            <div class="checklist-content">
+                                <div class="checklist-title">
+                                    <strong>{{ item.owner }}</strong> - {{ item.task }}
+                                </div>
+                                <div class="checklist-description">
+                                    Status: <span :style="{color: item.status === 'Completed' ? '#30D158' : item.status === 'In Progress' ? '#FF9900' : '#FF3B30'}">{{ item.status }}</span>
+                                </div>
+                            </div>
+                            <div class="checklist-actions">
+                                <button class="action-btn edit" @click="openChecklistModal(item)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete" @click="confirmDeleteChecklist(item)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="add-discussion-btn" @click="openChecklistModal(null)">
+                            <i class="fas fa-plus-circle"></i>
+                            <span>Add New Action Item</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Project Timeline Overview -->
+                    <h3 style="margin-bottom: 16px; font-size: 22px; color: #DA291C; margin-top: 40px;">Project Timeline Overview</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+                        <div style="background: linear-gradient(135deg, #DA291C 0%, #BC1D1A 100%); color: white; padding: 24px; border-radius: 12px;">
+                            <div style="font-size: 14px; opacity: 0.9;">January 2026</div>
+                            <div style="font-size: 18px; font-weight: 600; margin-top: 8px;">Tech/Marketing Kickoff</div>
+                            <div style="font-size: 14px; opacity: 0.9; margin-top: 8px;">Strategy to accelerate market opt-ins</div>
+                        </div>
+                        
+                        <div style="background: linear-gradient(135deg, #FFBC0D 0%, #FF9900 100%); color: #1d1d1f; padding: 24px; border-radius: 12px;">
+                            <div style="font-size: 14px;">March 1, 2026</div>
+                            <div style="font-size: 18px; font-weight: 600; margin-top: 8px;">Market Launch</div>
+                            <div style="font-size: 14px; margin-top: 8px;">Opt-in deadline & campaign begins</div>
+                        </div>
+                        
+                        <div style="background: #1d1d1f; color: white; padding: 24px; border-radius: 12px;">
+                            <div style="font-size: 14px; opacity: 0.9;">May 31, 2026</div>
+                            <div style="font-size: 18px; font-weight: 600; margin-top: 8px;">Campaign Conclusion</div>
+                            <div style="font-size: 14px; opacity: 0.9; margin-top: 8px;">Performance review & analysis</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Market Opt-Ins Tab -->
+        <main v-if="activeTab === 'optin'" class="container" style="padding: 30px 0;">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Market Opt-In Submissions</div>
+                    <div class="card-subtitle">Total submissions: {{ marketSubmissions.length }}</div>
+                    <button class="btn-primary" @click="exportMarketData" style="padding: 10px 20px; font-size: 14px;">
+                        <i class="fas fa-file-excel"></i> Export All to Excel
+                    </button>
+                </div>
+                <div class="card-content">
+                    <div v-if="marketSubmissions.length === 0" style="text-align: center; padding: 40px; color: #86868b;">
+                        <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                        <p>No market opt-in submissions yet.</p>
+                    </div>
+                    
+                    <div v-else>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background-color: #f8f8fa;">
+                                    <th style="padding: 16px; text-align: left; font-weight: 600; color: #1d1d1f; border-bottom: 2px solid #e5e5e7;">Country</th>
+                                    <th style="padding: 16px; text-align: left; font-weight: 600; color: #1d1d1f; border-bottom: 2px solid #e5e5e7;">Contact Name</th>
+                                    <th style="padding: 16px; text-align: left; font-weight: 600; color: #1d1d1f; border-bottom: 2px solid #e5e5e7;">Email</th>
+                                    <th style="padding: 16px; text-align: left; font-weight: 600; color: #1d1d1f; border-bottom: 2px solid #e5e5e7;">Dates</th>
+                                    <th style="padding: 16px; text-align: left; font-weight: 600; color: #1d1d1f; border-bottom: 2px solid #e5e5e7;">Submitted</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="submission in marketSubmissions" :key="submission.id" style="border-bottom: 1px solid #f0f0f0;">
+                                    <td style="padding: 16px;"><strong>{{ submission.country }}</strong></td>
+                                    <td style="padding: 16px;">{{ submission.firstName }} {{ submission.lastName }}</td>
+                                    <td style="padding: 16px;">{{ submission.email }}</td>
+                                    <td style="padding: 16px;">{{ formatDate(submission.startDate) }} to {{ formatDate(submission.endDate) }}</td>
+                                    <td style="padding: 16px;">{{ formatDate(submission.submittedDate) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Use</a>
+                    <a href="#">Data Security</a>
+                    <a href="#">Contact Support</a>
+                </div>
+                <p>© 2023-2026 Groupon x McDonald's Integration. All rights reserved.</p>
+                <p style="margin-top: 8px;">Project Lead: Eloise Monnin (Tech & Marketing Kickoff / Manager Engagement / Operations)</p>
+            </div>
+        </footer>
+        
+        <!-- Stakeholder Modal -->
+        <div class="modal-overlay" v-if="showStakeholderModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        {{ editingStakeholder ? 'Edit Stakeholder' : 'Add New Stakeholder' }}
+                    </div>
+                    <button class="modal-close" @click="closeStakeholderModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="modal-content">
+                    <form @submit.prevent="saveStakeholder">
+                        <div class="form-row">
+                            <label class="form-label">Avatar URL</label>
+                            <div class="avatar-upload">
+                                <div class="avatar-preview">
+                                    <img v-if="stakeholderForm.avatar" :src="stakeholderForm.avatar" alt="Avatar Preview">
+                                    <div v-else style="color: #86868b; font-size: 14px;">
+                                        No image
+                                    </div>
+                                </div>
+                                <div style="flex: 1;">
+                                    <input 
+                                        type="text" 
+                                        class="form-input" 
+                                        placeholder="Paste image URL (e.g., https://example.com/avatar.jpg)" 
+                                        v-model="stakeholderForm.avatar"
+                                    >
+                                    <div style="font-size: 12px; color: #86868b; margin-top: 8px;">
+                                        You can use any web image URL or upload to an image hosting service
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" class="form-input" placeholder="John Smith" v-model="stakeholderForm.name" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <label class="form-label">Role *</label>
+                            <input type="text" class="form-input" placeholder="Director of Global Engagement" v-model="stakeholderForm.role" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <label class="form-label">Responsibility *</label>
+                            <textarea class="form-textarea" rows="3" v-model="stakeholderForm.responsibility" required></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">
+                                {{ editingStakeholder ? 'Update Stakeholder' : 'Add Stakeholder' }}
+                            </button>
+                            <button type="button" class="btn-secondary" @click="closeStakeholderModal">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Discussion Point Modal -->
+        <div class="modal-overlay" v-if="showDiscussionModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        {{ editingDiscussion ? 'Edit Discussion Point' : 'Add New Discussion Point' }}
+                    </div>
+                    <button class="modal-close" @click="closeDiscussionModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="modal-content">
+                    <form @submit.prevent="saveDiscussion">
+                        <div class="form-row">
+                            <label class="form-label">Icon</label>
+                            <select class="form-select" v-model="discussionForm.icon">
+                                <option value="fas fa-database">Database Icon</option>
+                                <option value="fas fa-code">Code Icon</option>
+                                <option value="fas fa-globe">Globe Icon</option>
+                                <option value="fas fa-bullhorn">Bullhorn Icon</option>
+                                <option value="fas fa-users">Users Icon</option>
+                                <option value="fas fa-chart-line">Chart Icon</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-row">
+                            <label class="form-label">Title *</label>
+                            <input type="text" class="form-input" placeholder="CRM & Merchant Operations (Ernesto/Eloise)" v-model="discussionForm.title" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <label class="form-label">Details *</label>
+                            <textarea class="form-textarea" rows="6" v-model="discussionForm.details" required></textarea>
+                            <div style="font-size: 12px; color: #86868b; margin-top: 8px;">
+                                Use &lt;strong&gt; tags for bold text and &lt;p&gt; tags for paragraphs
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">
+                                {{ editingDiscussion ? 'Update Discussion' : 'Add Discussion' }}
+                            </button>
+                            <button type="button" class="btn-secondary" @click="closeDiscussionModal">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Checklist Modal -->
+        <div class="modal-overlay" v-if="showChecklistModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        {{ editingChecklist ? 'Edit Action Item' : 'Add New Action Item' }}
+                    </div>
+                    <button class="modal-close" @click="closeChecklistModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="modal-content">
+                    <form @submit.prevent="saveChecklistItem">
+                        <div class="form-row">
+                            <label class="form-label">Owner *</label>
+                            <input type="text" class="form-input" placeholder="Kendra" v-model="checklistForm.owner" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <label class="form-label">Task *</label>
+                            <textarea class="form-textarea" rows="3" v-model="checklistForm.task" required></textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <label class="form-label">Status *</label>
+                            <select class="form-select" v-model="checklistForm.status" required>
+                                <option value="Pending">Pending</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">
+                                {{ editingChecklist ? 'Update Action Item' : 'Add Action Item' }}
+                            </button>
+                            <button type="button" class="btn-secondary" @click="closeChecklistModal">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Delete Confirmation Modal -->
+        <div class="modal-overlay" v-if="showDeleteModal">
+            <div class="modal" style="max-width: 400px;">
+                <div class="modal-header">
+                    <div class="modal-title">Confirm Delete</div>
+                    <button class="modal-close" @click="closeDeleteModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="modal-content">
+                    <p style="margin-bottom: 24px;">Are you sure you want to delete <strong>{{ itemToDelete?.name || itemToDelete?.title || itemToDelete?.owner }}</strong>?</p>
+                    <div class="form-actions">
+                        <button class="btn-primary" @click="deleteItem" style="background: #FF3B30;">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                        <button class="btn-secondary" @click="closeDeleteModal">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+        
+        createApp({
+            setup() {
+                // Active tab state
+                const activeTab = ref('dashboard');
+                
+                // Country data
+                const countries = ref([
+                    { 
+                        id: 1, 
+                        name: 'UK', 
+                        visits: 10100000, 
+                        purchases: 364000, 
+                        revenue: '8M GBP',
+                        subscribers: 1600000,
+                        cities: [
+                            { name: 'London', value: 2200000 },
+                            { name: 'Manchester', value: 401000 },
+                            { name: 'Glasgow', value: 314000 },
+                            { name: 'Birmingham', value: 284000 },
+                            { name: 'Liverpool', value: 228000 },
+                            { name: 'Leed', value: 220000 },
+                            { name: 'Nottingham', value: 183000 }
+                        ]
+                    },
+                    { 
+                        id: 2, 
+                        name: 'US', 
+                        visits: 52000000, 
+                        purchases: 1900000, 
+                        revenue: '108M USD',
+                        subscribers: 44000000,
+                        cities: [
+                            { name: 'Chicago', value: 3000000 },
+                            { name: 'New York City', value: 2200000 },
+                            { name: 'Los Angeles', value: 1600000 },
+                            { name: 'Washington D.C.', value: 1300000 },
+                            { name: 'Atlanta', value: 1200000 },
+                            { name: 'Houston', value: 1000000 },
+                            { name: 'Dallas', value: 1000000 }
+                        ]
+                    },
+                    { 
+                        id: 3, 
+                        name: 'Belgium', 
+                        visits: 660000, 
+                        purchases: 18000, 
+                        revenue: '684K EUR',
+                        subscribers: 150000,
+                        cities: [
+                            { name: 'Bruxelles', value: 147000 },
+                            { name: 'Vlaanderen', value: 99000 },
+                            { name: 'Antwerpen', value: 85000 },
+                            { name: 'Liege', value: 76000 },
+                            { name: 'Mons', value: 46000 },
+                            { name: 'Limburg', value: 36000 },
+                            { name: 'Charleroi', value: 35000 }
+                        ]
+                    }
+                ]);
+                
+                // Set initial selected country to UK
+                const selectedCountry = ref(countries.value[0]);
+                
+                // Stakeholders data with avatar support
+                const stakeholders = ref([
+                    {
+                        id: 1,
+                        name: 'Kendra',
+                        role: 'Director of Global Engagement (Contract lead)',
+                        responsibility: 'Primary contract owner, responsible for agreement finalization and paper flow management.',
+                        avatar: 'https://images.unsplash.com/photo-1494790108755-2616b786d4d3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80'
+                    },
+                    {
+                        id: 2,
+                        name: 'Kate Davis',
+                        role: 'Director of Global Engagement Strategy',
+                        responsibility: 'Strategic oversight of global engagement initiatives and campaign alignment.',
+                        avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80'
+                    },
+                    {
+                        id: 3,
+                        name: 'Eloise Monnin',
+                        role: 'Tech & Marketing Kickoff / Manager Engagement / Operations',
+                        responsibility: 'Lead for tech integration, marketing kickoff, and operational execution. Market opt-in leader.',
+                        avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80'
+                    }
+                ]);
+                
+                // Store market submissions
+                const marketSubmissions = ref([
+                    {
+                        id: 1,
+                        country: 'US',
+                        firstName: 'John',
+                        lastName: 'Smith',
+                        email: 'john.smith@us.mcd.com',
+                        startDate: '2026-03-01',
+                        endDate: '2026-05-31',
+                        campaignDetails: 'Monopoly Campaign Integration',
+                        submittedDate: '2025-12-15'
+                    },
+                    {
+                        id: 2,
+                        country: 'UK',
+                        firstName: 'Sarah',
+                        lastName: 'Johnson',
+                        email: 'sarah.johnson@uk.mcd.com',
+                        startDate: '2026-03-01',
+                        endDate: '2026-05-31',
+                        campaignDetails: 'Standalone promotion',
+                        submittedDate: '2025-12-18'
+                    }
+                ]);
+                
+                // Discussion points data (now editable)
+                const discussionPoints = ref([
+                    {
+                        id: 1,
+                        icon: 'fas fa-database',
+                        title: 'CRM & Merchant Operations (Ernesto/Eloise)',
+                        details: '<p><strong>Connected Inventory:</strong> Finalizing how inventory syncs with CRM.</p><p><strong>Merchant Terms:</strong> Addressing the 50–70 merchants currently not accepting promos - Terms & Conditions (T&Cs).</p><p><strong>T&C Updates:</strong> Need to explicitly list out the Exclusions and details for the 5% promo.</p>'
+                    },
+                    {
+                        id: 2,
+                        icon: 'fas fa-code',
+                        title: 'Technical & Code Generation (Quentin)',
+                        details: '<p><strong>Code Gen:</strong> Quentin to provide the estimated timeline for code generation.</p><p><strong>Pacing:</strong> Sourcing feedback on the revised timeline based on market-specific needs.</p>'
+                    },
+                    {
+                        id: 3,
+                        icon: 'fas fa-globe',
+                        title: 'Market Strategy & Planning',
+                        details: '<p><strong>Lead Time:</strong> Markets require significant lead time for planning.</p><p><strong>Opt-in Window:</strong> Focus on a strategy to accelerate market opt-ins.</p><p><strong>Planning Start:</strong> January</p><p><strong>Deadline/Launch:</strong> March 1st</p>'
+                    },
+                    {
+                        id: 4,
+                        icon: 'fas fa-bullhorn',
+                        title: 'Campaign Updates',
+                        details: '<p><strong>US FIFA Campaign:</strong> Groupon campaign delayed - timeline Q3 to Q4.</p><p><strong>Duration:</strong> The campaign is scheduled to run for 4 weeks.</p>'
+                    }
+                ]);
+                
+                // Checklist items (Action items)
+                const checklistItems = ref([
+                    {
+                        id: 1,
+                        owner: 'Kendra',
+                        task: 'Send the contract/paper trail to Barbara. cc Zen',
+                        status: 'Pending',
+                        completed: false
+                    },
+                    {
+                        id: 2,
+                        owner: 'Ernesto',
+                        task: 'Review the list of excluded merchants and T&C details.',
+                        status: 'In Progress',
+                        completed: false
+                    },
+                    {
+                        id: 3,
+                        owner: 'Quentin',
+                        task: 'Provide the revised timeline for code generation.',
+                        status: 'In Progress',
+                        completed: false
+                    },
+                    {
+                        id: 4,
+                        owner: 'Eloise/Zen',
+                        task: 'Finalize the market flow/opt-in and operational timeline for the January kickoff.',
+                        status: 'In Progress',
+                        completed: false
+                    }
+                ]);
+                
+                // Market opt-in form state
+                const showOptInForm = ref(false);
+                const marketOptIn = ref({
+                    country: '',
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    startDate: '',
+                    endDate: '',
+                    campaignDetails: ''
+                });
+                
+                // Stakeholder modal state
+                const showStakeholderModal = ref(false);
+                const editingStakeholder = ref(null);
+                const stakeholderForm = ref({
+                    id: null,
+                    name: '',
+                    role: '',
+                    responsibility: '',
+                    avatar: ''
+                });
+                
+                // Discussion modal state
+                const showDiscussionModal = ref(false);
+                const editingDiscussion = ref(null);
+                const discussionForm = ref({
+                    id: null,
+                    icon: 'fas fa-database',
+                    title: '',
+                    details: ''
+                });
+                
+                // Checklist modal state
+                const showChecklistModal = ref(false);
+                const editingChecklist = ref(null);
+                const checklistForm = ref({
+                    id: null,
+                    owner: '',
+                    task: '',
+                    status: 'Pending',
+                    completed: false
+                });
+                
+                // Delete modal state
+                const showDeleteModal = ref(false);
+                const itemToDelete = ref(null);
+                const deleteType = ref(''); // 'stakeholder', 'discussion', 'checklist'
+                
+                // Function to select a country
+                const selectCountry = (country) => {
+                    selectedCountry.value = country;
+                };
+                
+                // Function to format large numbers
+                const formatNumber = (num) => {
+                    if (num >= 1000000) {
+                        return (num / 1000000).toFixed(1) + 'M';
+                    } else if (num >= 1000) {
+                        return (num / 1000).toFixed(1) + 'K';
+                    }
+                    return num.toString();
+                };
+                
+                // Function to format dates
+                const formatDate = (dateString) => {
+                    if (!dateString) return 'N/A';
+                    const date = new Date(dateString);
+                    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                };
+                
+                // Toggle opt-in form
+                const toggleOptInForm = () => {
+                    showOptInForm.value = !showOptInForm.value;
+                };
+                
+                // Submit market opt-in
+                const submitMarketOptIn = () => {
+                    const submission = {
+                        id: marketSubmissions.value.length + 1,
+                        country: marketOptIn.value.country,
+                        firstName: marketOptIn.value.firstName,
+                        lastName: marketOptIn.value.lastName,
+                        email: marketOptIn.value.email,
+                        startDate: marketOptIn.value.startDate,
+                        endDate: marketOptIn.value.endDate,
+                        campaignDetails: marketOptIn.value.campaignDetails,
+                        submittedDate: new Date().toISOString().split('T')[0]
+                    };
+                    
+                    marketSubmissions.value.push(submission);
+                    
+                    // Reset form
+                    marketOptIn.value = {
+                        country: '',
+                        firstName: '',
+                        lastName: '',
+                        email: '',
+                        startDate: '',
+                        endDate: '',
+                        campaignDetails: ''
+                    };
+                    
+                    // Show success message
+                    alert('Market opt-in submitted successfully!');
+                    
+                    // Switch to opt-in tab
+                    activeTab.value = 'optin';
+                };
+                
+                // Open stakeholder modal for editing or adding
+                const openStakeholderModal = (stakeholder) => {
+                    if (stakeholder) {
+                        editingStakeholder.value = stakeholder;
+                        stakeholderForm.value = {
+                            id: stakeholder.id,
+                            name: stakeholder.name,
+                            role: stakeholder.role,
+                            responsibility: stakeholder.responsibility,
+                            avatar: stakeholder.avatar || ''
+                        };
+                    } else {
+                        editingStakeholder.value = null;
+                        stakeholderForm.value = {
+                            id: null,
+                            name: '',
+                            role: '',
+                            responsibility: '',
+                            avatar: ''
+                        };
+                    }
+                    showStakeholderModal.value = true;
+                };
+                
+                // Close stakeholder modal
+                const closeStakeholderModal = () => {
+                    showStakeholderModal.value = false;
+                    editingStakeholder.value = null;
+                    stakeholderForm.value = {
+                        id: null,
+                        name: '',
+                        role: '',
+                        responsibility: '',
+                        avatar: ''
+                    };
+                };
+                
+                // Save stakeholder (add or update)
+                const saveStakeholder = () => {
+                    if (editingStakeholder.value) {
+                        // Update existing stakeholder
+                        const index = stakeholders.value.findIndex(s => s.id === editingStakeholder.value.id);
+                        if (index !== -1) {
+                            stakeholders.value[index] = {
+                                ...stakeholders.value[index],
+                                ...stakeholderForm.value
+                            };
+                        }
+                    } else {
+                        // Add new stakeholder
+                        const newId = stakeholders.value.length > 0 
+                            ? Math.max(...stakeholders.value.map(s => s.id)) + 1 
+                            : 1;
+                        
+                        stakeholders.value.push({
+                            id: newId,
+                            name: stakeholderForm.value.name,
+                            role: stakeholderForm.value.role,
+                            responsibility: stakeholderForm.value.responsibility,
+                            avatar: stakeholderForm.value.avatar
+                        });
+                    }
+                    
+                    closeStakeholderModal();
+                };
+                
+                // Open discussion modal for editing or adding
+                const openDiscussionModal = (discussion) => {
+                    if (discussion) {
+                        editingDiscussion.value = discussion;
+                        discussionForm.value = {
+                            id: discussion.id,
+                            icon: discussion.icon,
+                            title: discussion.title,
+                            details: discussion.details
+                        };
+                    } else {
+                        editingDiscussion.value = null;
+                        discussionForm.value = {
+                            id: null,
+                            icon: 'fas fa-database',
+                            title: '',
+                            details: ''
+                        };
+                    }
+                    showDiscussionModal.value = true;
+                };
+                
+                // Close discussion modal
+                const closeDiscussionModal = () => {
+                    showDiscussionModal.value = false;
+                    editingDiscussion.value = null;
+                    discussionForm.value = {
+                        id: null,
+                        icon: 'fas fa-database',
+                        title: '',
+                        details: ''
+                    };
+                };
+                
+                // Save discussion (add or update)
+                const saveDiscussion = () => {
+                    if (editingDiscussion.value) {
+                        // Update existing discussion
+                        const index = discussionPoints.value.findIndex(d => d.id === editingDiscussion.value.id);
+                        if (index !== -1) {
+                            discussionPoints.value[index] = {
+                                ...discussionPoints.value[index],
+                                ...discussionForm.value
+                            };
+                        }
+                    } else {
+                        // Add new discussion
+                        const newId = discussionPoints.value.length > 0 
+                            ? Math.max(...discussionPoints.value.map(d => d.id)) + 1 
+                            : 1;
+                        
+                        discussionPoints.value.push({
+                            id: newId,
+                            icon: discussionForm.value.icon,
+                            title: discussionForm.value.title,
+                            details: discussionForm.value.details
+                        });
+                    }
+                    
+                    closeDiscussionModal();
+                };
+                
+                // Open checklist modal for editing or adding
+                const openChecklistModal = (checklist) => {
+                    if (checklist) {
+                        editingChecklist.value = checklist;
+                        checklistForm.value = {
+                            id: checklist.id,
+                            owner: checklist.owner,
+                            task: checklist.task,
+                            status: checklist.status,
+                            completed: checklist.completed
+                        };
+                    } else {
+                        editingChecklist.value = null;
+                        checklistForm.value = {
+                            id: null,
+                            owner: '',
+                            task: '',
+                            status: 'Pending',
+                            completed: false
+                        };
+                    }
+                    showChecklistModal.value = true;
+                };
+                
+                // Close checklist modal
+                const closeChecklistModal = () => {
+                    showChecklistModal.value = false;
+                    editingChecklist.value = null;
+                    checklistForm.value = {
+                        id: null,
+                        owner: '',
+                        task: '',
+                        status: 'Pending',
+                        completed: false
+                    };
+                };
+                
+                // Save checklist item (add or update)
+                const saveChecklistItem = () => {
+                    if (editingChecklist.value) {
+                        // Update existing checklist item
+                        const index = checklistItems.value.findIndex(c => c.id === editingChecklist.value.id);
+                        if (index !== -1) {
+                            checklistItems.value[index] = {
+                                ...checklistItems.value[index],
+                                ...checklistForm.value
+                            };
+                        }
+                    } else {
+                        // Add new checklist item
+                        const newId = checklistItems.value.length > 0 
+                            ? Math.max(...checklistItems.value.map(c => c.id)) + 1 
+                            : 1;
+                        
+                        checklistItems.value.push({
+                            id: newId,
+                            owner: checklistForm.value.owner,
+                            task: checklistForm.value.task,
+                            status: checklistForm.value.status,
+                            completed: checklistForm.value.completed
+                        });
+                    }
+                    
+                    closeChecklistModal();
+                };
+                
+                // Save checklist state
+                const saveChecklist = () => {
+                    // This function is called when checkbox state changes
+                    // In a real app, you might want to save this to a backend
+                    console.log('Checklist updated', checklistItems.value);
+                };
+                
+                // Confirm delete item
+                const confirmDeleteStakeholder = (stakeholder) => {
+                    itemToDelete.value = stakeholder;
+                    deleteType.value = 'stakeholder';
+                    showDeleteModal.value = true;
+                };
+                
+                const confirmDeleteDiscussion = (discussion) => {
+                    itemToDelete.value = discussion;
+                    deleteType.value = 'discussion';
+                    showDeleteModal.value = true;
+                };
+                
+                const confirmDeleteChecklist = (checklist) => {
+                    itemToDelete.value = checklist;
+                    deleteType.value = 'checklist';
+                    showDeleteModal.value = true;
+                };
+                
+                // Close delete modal
+                const closeDeleteModal = () => {
+                    showDeleteModal.value = false;
+                    itemToDelete.value = null;
+                    deleteType.value = '';
+                };
+                
+                // Delete item
+                const deleteItem = () => {
+                    if (deleteType.value === 'stakeholder') {
+                        stakeholders.value = stakeholders.value.filter(
+                            s => s.id !== itemToDelete.value.id
+                        );
+                    } else if (deleteType.value === 'discussion') {
+                        discussionPoints.value = discussionPoints.value.filter(
+                            d => d.id !== itemToDelete.value.id
+                        );
+                    } else if (deleteType.value === 'checklist') {
+                        checklistItems.value = checklistItems.value.filter(
+                            c => c.id !== itemToDelete.value.id
+                        );
+                    }
+                    
+                    closeDeleteModal();
+                };
+                
+                // Export market data to Excel
+                const exportMarketData = () => {
+                    // Create CSV content
+                    let csvContent = "data:text/csv;charset=utf-8,";
+                    
+                    // Add headers
+                    csvContent += "Country,First Name,Last Name,Email,Start Date,End Date,Campaign Details,Submitted Date\n";
+                    
+                    // Add data rows
+                    marketSubmissions.value.forEach(submission => {
+                        const row = [
+                            submission.country,
+                            submission.firstName,
+                            submission.lastName,
+                            submission.email,
+                            submission.startDate,
+                            submission.endDate,
+                            submission.campaignDetails,
+                            submission.submittedDate
+                        ].map(field => `"${field}"`).join(",");
+                        
+                        csvContent += row + "\n";
+                    });
+                    
+                    // Create download link
+                    const encodedUri = encodeURI(csvContent);
+                    const link = document.createElement("a");
+                    link.setAttribute("href", encodedUri);
+                    link.setAttribute("download", `Groupon_Market_OptIns_${new Date().toISOString().split('T')[0]}.csv`);
+                    document.body.appendChild(link);
+                    
+                    // Trigger download
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    alert(`Exported ${marketSubmissions.value.length} market opt-ins to CSV file.`);
+                };
+                
+                return {
+                    activeTab,
+                    countries,
+                    selectedCountry,
+                    selectCountry,
+                    formatNumber,
+                    formatDate,
+                    stakeholders,
+                    marketSubmissions,
+                    discussionPoints,
+                    checklistItems,
+                    showOptInForm,
+                    marketOptIn,
+                    showStakeholderModal,
+                    editingStakeholder,
+                    stakeholderForm,
+                    showDiscussionModal,
+                    editingDiscussion,
+                    discussionForm,
+                    showChecklistModal,
+                    editingChecklist,
+                    checklistForm,
+                    showDeleteModal,
+                    itemToDelete,
+                    deleteType,
+                    toggleOptInForm,
+                    submitMarketOptIn,
+                    openStakeholderModal,
+                    closeStakeholderModal,
+                    saveStakeholder,
+                    openDiscussionModal,
+                    closeDiscussionModal,
+                    saveDiscussion,
+                    openChecklistModal,
+                    closeChecklistModal,
+                    saveChecklistItem,
+                    saveChecklist,
+                    confirmDeleteStakeholder,
+                    confirmDeleteDiscussion,
+                    confirmDeleteChecklist,
+                    closeDeleteModal,
+                    deleteItem,
+                    exportMarketData
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
