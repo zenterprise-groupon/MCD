@@ -87,6 +87,71 @@
             background: rgba(255, 255, 255, 0.15);
             padding: 8px 16px;
             border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .user-info:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+        }
+        
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .user-avatar i {
+            font-size: 36px;
+            color: white;
+        }
+        
+        .avatar-edit-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .user-avatar:hover .avatar-edit-overlay {
+            opacity: 1;
+        }
+        
+        .avatar-edit-overlay i {
+            color: white;
+            font-size: 16px;
+        }
+        
+        .save-status {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 4px;
+            text-align: right;
+        }
+        
+        .save-status.saving {
+            color: #FFBC0D;
+        }
+        
+        .save-status.saved {
+            color: #30D158;
         }
         
         /* Navigation Tabs */
@@ -896,6 +961,10 @@
             .stakeholders-grid {
                 grid-template-columns: 1fr;
             }
+            
+            .user-info {
+                align-self: flex-end;
+            }
         }
     </style>
 </head>
@@ -917,9 +986,20 @@
                     </div>
                     <div class="tagline">Global Campaign Management & Market Opt-In Portal</div>
                 </div>
-                <div class="user-info">
-                    <i class="fas fa-user-circle"></i>
-                    <span>Eloise Monnin | Tech & Marketing Kickoff Manager</span>
+                <div class="user-section">
+                    <div class="user-info" @click="openAvatarModal">
+                        <div class="user-avatar">
+                            <img v-if="userAvatar" :src="userAvatar" alt="User Avatar">
+                            <i v-else class="fas fa-user-circle"></i>
+                            <div class="avatar-edit-overlay">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                        </div>
+                        <span>Eloise Monnin | Tech & Marketing Kickoff Manager</span>
+                    </div>
+                    <div class="save-status" :class="saveStatus">
+                        {{ saveStatus === 'saving' ? 'Saving changes...' : 'All changes saved' }}
+                    </div>
                 </div>
             </div>
         </header>
@@ -1437,6 +1517,61 @@
             </div>
         </footer>
         
+        <!-- Avatar Modal -->
+        <div class="modal-overlay" v-if="showAvatarModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        Edit Your Avatar
+                    </div>
+                    <button class="modal-close" @click="closeAvatarModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="modal-content">
+                    <form @submit.prevent="saveAvatar">
+                        <div class="form-row">
+                            <label class="form-label">Avatar Image URL</label>
+                            <div class="avatar-upload">
+                                <div class="avatar-preview">
+                                    <img v-if="avatarForm.url" :src="avatarForm.url" alt="Avatar Preview">
+                                    <div v-else style="color: #86868b; font-size: 14px;">
+                                        No image
+                                    </div>
+                                </div>
+                                <div style="flex: 1;">
+                                    <input 
+                                        type="text" 
+                                        class="form-input" 
+                                        placeholder="Paste image URL (e.g., https://example.com/avatar.jpg)" 
+                                        v-model="avatarForm.url"
+                                    >
+                                    <div style="font-size: 12px; color: #86868b; margin-top: 8px;">
+                                        You can use any web image URL or upload to an image hosting service
+                                    </div>
+                                    <div style="margin-top: 12px;">
+                                        <button type="button" class="avatar-upload-btn" @click="setSampleAvatar">
+                                            <i class="fas fa-image"></i> Use Sample Avatar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">
+                                Save Avatar
+                            </button>
+                            <button type="button" class="btn-secondary" @click="closeAvatarModal">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
         <!-- Stakeholder Modal -->
         <div class="modal-overlay" v-if="showStakeholderModal">
             <div class="modal">
@@ -1626,12 +1761,19 @@
     </div>
 
     <script>
-        const { createApp, ref, computed } = Vue;
+        const { createApp, ref, computed, onMounted, onUnmounted } = Vue;
         
         createApp({
             setup() {
+                // Auto-save state
+                const saveStatus = ref('saved');
+                const autoSaveInterval = ref(null);
+                
                 // Active tab state
                 const activeTab = ref('dashboard');
+                
+                // User avatar state
+                const userAvatar = ref('');
                 
                 // Country data
                 const countries = ref([
@@ -1814,6 +1956,12 @@
                     campaignDetails: ''
                 });
                 
+                // Avatar modal state
+                const showAvatarModal = ref(false);
+                const avatarForm = ref({
+                    url: ''
+                });
+                
                 // Stakeholder modal state
                 const showStakeholderModal = ref(false);
                 const editingStakeholder = ref(null);
@@ -1850,6 +1998,56 @@
                 const showDeleteModal = ref(false);
                 const itemToDelete = ref(null);
                 const deleteType = ref(''); // 'stakeholder', 'discussion', 'checklist'
+                
+                // Auto-save function
+                const autoSaveData = () => {
+                    saveStatus.value = 'saving';
+                    
+                    const dataToSave = {
+                        stakeholders: stakeholders.value,
+                        discussionPoints: discussionPoints.value,
+                        checklistItems: checklistItems.value,
+                        marketSubmissions: marketSubmissions.value,
+                        userAvatar: userAvatar.value,
+                        activeTab: activeTab.value,
+                        lastSaved: new Date().toISOString()
+                    };
+                    
+                    try {
+                        localStorage.setItem('grouponMcdData', JSON.stringify(dataToSave));
+                        
+                        // Simulate network delay for UI feedback
+                        setTimeout(() => {
+                            saveStatus.value = 'saved';
+                        }, 500);
+                        
+                        console.log('Data auto-saved successfully');
+                    } catch (error) {
+                        console.error('Error saving data:', error);
+                        saveStatus.value = 'saved'; // Reset status even on error
+                    }
+                };
+                
+                // Load saved data on startup
+                const loadSavedData = () => {
+                    try {
+                        const savedData = localStorage.getItem('grouponMcdData');
+                        if (savedData) {
+                            const parsedData = JSON.parse(savedData);
+                            
+                            if (parsedData.stakeholders) stakeholders.value = parsedData.stakeholders;
+                            if (parsedData.discussionPoints) discussionPoints.value = parsedData.discussionPoints;
+                            if (parsedData.checklistItems) checklistItems.value = parsedData.checklistItems;
+                            if (parsedData.marketSubmissions) marketSubmissions.value = parsedData.marketSubmissions;
+                            if (parsedData.userAvatar) userAvatar.value = parsedData.userAvatar;
+                            if (parsedData.activeTab) activeTab.value = parsedData.activeTab;
+                            
+                            console.log('Data loaded from localStorage');
+                        }
+                    } catch (error) {
+                        console.error('Error loading saved data:', error);
+                    }
+                };
                 
                 // Function to select a country
                 const selectCountry = (country) => {
@@ -1905,11 +2103,38 @@
                         campaignDetails: ''
                     };
                     
+                    // Auto-save after adding submission
+                    autoSaveData();
+                    
                     // Show success message
                     alert('Market opt-in submitted successfully!');
                     
                     // Switch to opt-in tab
                     activeTab.value = 'optin';
+                };
+                
+                // Open avatar modal
+                const openAvatarModal = () => {
+                    avatarForm.value.url = userAvatar.value;
+                    showAvatarModal.value = true;
+                };
+                
+                // Close avatar modal
+                const closeAvatarModal = () => {
+                    showAvatarModal.value = false;
+                    avatarForm.value = { url: '' };
+                };
+                
+                // Save avatar
+                const saveAvatar = () => {
+                    userAvatar.value = avatarForm.value.url;
+                    closeAvatarModal();
+                    autoSaveData();
+                };
+                
+                // Set sample avatar
+                const setSampleAvatar = () => {
+                    avatarForm.value.url = 'https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=80';
                 };
                 
                 // Open stakeholder modal for editing or adding
@@ -1976,6 +2201,7 @@
                     }
                     
                     closeStakeholderModal();
+                    autoSaveData();
                 };
                 
                 // Open discussion modal for editing or adding
@@ -2038,6 +2264,7 @@
                     }
                     
                     closeDiscussionModal();
+                    autoSaveData();
                 };
                 
                 // Open checklist modal for editing or adding
@@ -2104,13 +2331,13 @@
                     }
                     
                     closeChecklistModal();
+                    autoSaveData();
                 };
                 
                 // Save checklist state
                 const saveChecklist = () => {
                     // This function is called when checkbox state changes
-                    // In a real app, you might want to save this to a backend
-                    console.log('Checklist updated', checklistItems.value);
+                    autoSaveData();
                 };
                 
                 // Confirm delete item
@@ -2156,6 +2383,7 @@
                     }
                     
                     closeDeleteModal();
+                    autoSaveData();
                 };
                 
                 // Export market data to Excel
@@ -2196,19 +2424,40 @@
                     alert(`Exported ${marketSubmissions.value.length} market opt-ins to CSV file.`);
                 };
                 
+                // Set up auto-save on component mount
+                onMounted(() => {
+                    // Load saved data
+                    loadSavedData();
+                    
+                    // Set up periodic auto-save
+                    autoSaveInterval.value = setInterval(() => {
+                        autoSaveData();
+                    }, 30000); // Auto-save every 30 seconds
+                    
+                    console.log('Auto-save system initialized');
+                });
+                
+                // Clean up interval on unmount
+                onUnmounted(() => {
+                    if (autoSaveInterval.value) {
+                        clearInterval(autoSaveInterval.value);
+                    }
+                });
+                
                 return {
+                    saveStatus,
                     activeTab,
+                    userAvatar,
                     countries,
                     selectedCountry,
-                    selectCountry,
-                    formatNumber,
-                    formatDate,
                     stakeholders,
                     marketSubmissions,
                     discussionPoints,
                     checklistItems,
                     showOptInForm,
                     marketOptIn,
+                    showAvatarModal,
+                    avatarForm,
                     showStakeholderModal,
                     editingStakeholder,
                     stakeholderForm,
@@ -2221,8 +2470,15 @@
                     showDeleteModal,
                     itemToDelete,
                     deleteType,
+                    selectCountry,
+                    formatNumber,
+                    formatDate,
                     toggleOptInForm,
                     submitMarketOptIn,
+                    openAvatarModal,
+                    closeAvatarModal,
+                    saveAvatar,
+                    setSampleAvatar,
                     openStakeholderModal,
                     closeStakeholderModal,
                     saveStakeholder,
@@ -2238,7 +2494,8 @@
                     confirmDeleteChecklist,
                     closeDeleteModal,
                     deleteItem,
-                    exportMarketData
+                    exportMarketData,
+                    autoSaveData
                 };
             }
         }).mount('#app');
